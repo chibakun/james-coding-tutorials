@@ -1,0 +1,382 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<title>James's Coding Tutorials</title>
+	<meta name="description" content="James's Coding Tutorials">
+	<meta name="author" content="James">
+
+	<link rel="stylesheet" href="css/site.css">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	
+	<link rel="stylesheet" href="css/prettify.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+	<script src="scripts/bootstrap.min.js"></script>
+	
+	<script src="scripts/prettify.js"></script>
+	
+	<script src="scripts/site.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<div class="container">
+	<div class="jumbotron">
+	<h1>James's Coding Tutorial</h1>    
+	<p>This site contains tutrials on topics such as C#, ASP.NET MVC and general web development.</p>
+	</div>
+	<a href="index.html">Home</a>
+	
+	<h3>WebAPi 2.0 tutorial</h3>
+	
+ 
+
+
+
+<p>Start a new project  - ASP.NET Web Application</p>
+
+<img class="img-fluid" src="images/chatapp001.jpg" alt="chatapp001" width="956" height="670" />
+
+<p>Choose MVC with Web API references</p>
+
+<p>Choose no authentication</p>
+
+<img class="img-fluid" src="images/chatapp002.jpg" alt="chatapp002" width="803" height="644" />
+
+<p>Add a Business Object and a DAL class project</p>
+
+<img class="img-fluid" src="images/chatapp003.jpg" alt="chatapp003" width="242" height="120" />
+
+<p>Add a new Web API controller</p>
+
+<img class="img-fluid" src="images/chatapp004.jpg" alt="chatapp004" width="1112" height="404" />
+
+<p>Open another instance of Visual Studio and create a database project</p>
+
+<img class="img-fluid" src="images/chatapp005.jpg" alt="chatapp005" width="954" height="668" />
+
+<p>Add a table ChatMessages.sql</p>
+
+<img class="img-fluid" src="images/chatapp006.jpg" alt="chatapp006" width="1483" height="337" />
+
+<p>In SQLMS, add a database called ChatApp</p>
+
+<img class="img-fluid" src="images/chatapp007.jpg" alt="chatapp007" width="700" height="644" />
+
+<p>Now, back in database project, publish it to the newly created database</p>
+
+<img class="img-fluid" src="images/chatapp008.jpg" alt="chatapp008" width="647" height="377" />
+
+<img class="img-fluid" src="images/chatapp010.jpg" alt="chatapp010" width="507" height="139" />
+
+<p>Confirm the table exists</p>
+
+<img class="img-fluid" src="images/chatapp011.jpg" alt="chatapp011" width="961" height="346" />
+
+<p>In the Web Application, create a BO class with the same properties as the database table.</p>
+
+<img class="img-fluid" src="images/chatapp012.jpg" alt="chatapp012" width="1284" height="566" />
+
+ 
+
+<p>Next for the data access layer project</p>
+
+<img class="img-fluid" src="images/chatapp013.jpg" alt="chatapp013" width="169" height="85" />
+
+<p>Add these methods to the interface</p>
+
+<img class="img-fluid" src="images/chatapp014.jpg" alt="chatapp014" width="437" height="211" />
+
+<p>Implement the methods</p>
+
+
+<pre class="prettyprint">
+<code>
+public class ChatAppDAL : IChatAppDAL
+    {
+        private string connectionString;
+
+        public ChatAppDAL(string connectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
+        private IDbConnection GetOpenConnection()
+        {
+
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            return connection;
+        }
+
+        public void AddChatMessage(ChatMessageBO message)
+        {
+            try
+            {
+                using (var connection = GetOpenConnection())
+                {
+                    connection.Insert(message);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+        }
+
+        public IEnumerable<ChatMessageBO> GetChatMessages()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                return connection.GetAll<ChatMessageBO>();
+            }
+        }
+
+        public UserBO AddUser(UserBO user)
+        {
+            using (var connection = GetOpenConnection())
+            {
+                user.UserId = (int)connection.Insert(user);
+                return user;
+            }
+        }
+
+        public IEnumerable<UserBO> GetUsers()
+        {
+            using (var connection = GetOpenConnection())
+            {
+                return connection.GetAll<UserBO>();
+            }
+        }
+</code>		
+</pre>
+
+
+<p>Next add Dapper</p>
+
+<img class="img-fluid" src="images/chatapp016.jpg" alt="chatapp016" width="1525" height="406" />
+
+<p>...and then Dapper.Contrib</p>
+
+<img class="img-fluid" src="images/chatapp017.jpg" alt="chatapp017" width="1499" height="373" />
+
+<p>Resolve the references in the DAL methods</p>
+
+<img class="img-fluid" src="images/chatapp018.jpg" alt="chatapp018" width="579" height="492" />
+
+<p>Add a service folder and service class</p>
+
+<img class="img-fluid" src="images/chatapp019.jpg" alt="chatapp019" width="418" height="321" />
+
+<p>Give it a constructor and pass in the DAL. Add two methods as below.</p>
+
+<img class="img-fluid" src="images/chatapp020.jpg" alt="chatapp020" width="581" height="341" />
+
+<img class="img-fluid" src="images/chatapp021.jpg" alt="chatapp021" width="671" height="550" />
+
+<p>Now this is in place, the service can be used by the API Controller</p>
+
+<img class="img-fluid" src="images/chatapp022.jpg" alt="chatapp022" width="719" height="599" />
+
+<p>Open Nuget and add Ninject to the project</p>
+
+<div><img class="img-fluid" src="images/chatapp023.jpg" alt="chatapp023" width="1490" height="367" /> Ninject</div>
+
+<div><img class="img-fluid" src="images/chatapp024.jpg" alt="chatapp024" width="1479" height="369" /> Ninject MVC5</div>
+
+ <div><img class="img-fluid" src="images/chatapp025.jpg" alt="chatapp025" width="1468" height="390" /> Ninject Web WebApi</div>
+
+ 
+
+<p>Add a NinjectWebCommon.cs file to App_Start folder</p>
+
+<img class="img-fluid" src="images/chatapp026.jpg" alt="chatapp026" width="1649" height="633" />
+
+<p>RegisterServices method</p>
+
+<img class="img-fluid" src="images/chatapp027.jpg" alt="chatapp027" width="1136" height="266" />
+
+<p>Resolve the WebActivatorEx error</p>
+
+<img class="img-fluid" src="images/chatapp028.jpg" alt="chatapp028" width="995" height="89" />
+
+<p>Open nuget and add WebActivatorEx</p>
+
+<img class="img-fluid" src="images/chatapp029.jpg" alt="chatapp029" width="1477" height="353" />
+
+<p>Add a connection string to the webconfig file</p>
+
+<p>e.g<br/>
+
+<connectionStrings>
+<add name="DefaultConnection"
+connectionString="Data Source=LAPTOP-DJHC8A3N\SQLEXPRESS;
+Initial Catalog=ChatApp;
+Integrated Security=True"
+providerName="System.Data.SqlClient" />
+</connectionStrings>
+</p>
+
+<p>Now for the client side stuff: html, CSS, Bootstrap and JavaScript.</p>
+
+<img class="img-fluid" src="images/chatapp030.jpg" alt="chatapp030" width="201" height="69" />
+
+<p>https://www.microsoft.com/en-us/download/details.aspx?id=48593</p>
+
+<p>Add TypeScript for VS 2015</p>
+
+<img class="img-fluid" src="images/chatapp031.jpg" alt="chatapp031" width="495" height="307" />
+
+ 
+
+<p>In Nuget, update Bootstrap to the latest version which will also update jQuery.</p>
+
+<img class="img-fluid" src="images/chatapp032.jpg" alt="chatapp032" width="1481" height="345" />
+
+<p>Add a client javascript file</p>
+
+<img class="img-fluid" src="images/chatapp034.jpg" alt="chatapp034" width="277" height="341" />
+
+<p>Then include it in the bundleconfig</p>
+
+<img class="img-fluid" src="images/chatapp033.jpg" alt="chatapp033" width="561" height="95" />
+
+<p>Include the bundle in the layout</p>
+
+<img class="img-fluid" src="images/chatapp035.jpg" alt="chatapp035" width="705" height="517" />
+
+ 
+
+<p>We need to monitor HTTP requests made from the client to server and Fidler is useful for doing that.</p><p>https://www.telerik.com/download/fiddler/fiddler4</p>
+
+ 
+
+<p>An additional Ninject reference needs to be added using Nuget to get the API running.</p>
+
+<div><img class="img-fluid" src="images/chatapp036.jpg" alt="chatapp036" width="1477" height="369" /> Ninject.Web.WebApi.WebHost</div>
+
+<p>Change the add message api so that returns bad request if the body of the message is malformed.</p>
+
+<img class="img-fluid" src="images/chatapp039.jpg" alt="chatapp039" width="681" height="366" />
+
+<p>Add in some simple html into the index page, a button, input and container where the messages will go.</p>
+
+<img class="img-fluid" src="images/chatapp037.jpg" alt="chatapp037" width="1109" height="652" />
+
+<p>In the JavaScript file , add in a jQuery click event and an ajax call.</p>
+
+<img class="img-fluid" src="images/chatapp038.jpg" alt="chatapp038" width="1065" height="792" />
+
+<p>Build and run the application</p>
+
+<img class="img-fluid" src="images/chatapp040.jpg" alt="chatapp040" width="966" height="244" />
+
+<p>The action method gets hit</p>
+
+<img class="img-fluid" src="images/chatapp041.jpg" alt="chatapp041" width="672" height="315" />
+
+<p>Inspect the object</p>
+
+<img class="img-fluid" src="images/chatapp042.jpg" alt="chatapp042" width="798" height="193" />
+
+<p>In SQL , we can see the inserted row</p>
+
+<img class="img-fluid" src="images/chatapp043.jpg" alt="chatapp043" width="1104" height="341" />
+
+<p>Now we need to write a client side Get request in JavaScript</p>
+
+<img class="img-fluid" src="images/chatapp044.jpg" alt="chatapp044" width="901" height="836" />
+
+<p>Build and run. On the left we have our input for adding new messages and on the right , the list of chat messages.</p>
+
+<img class="img-fluid" src="images/chatapp045.jpg" alt="chatapp045" width="1040" height="887" />
+
+<p>Made a slight alteration to the service, adding an order by filter</p>
+
+<img class="img-fluid" src="images/chatapp046.jpg" alt="chatapp046" width="674" height="283" />
+
+ 
+
+<p>Add a Users table to the database</p>
+
+<p></p>
+<pre class="prettyprint">
+<code>
+CREATE TABLE [dbo].[Users]
+(
+	[UserId] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [UserName] NVARCHAR(50) NOT NULL, 
+    [Email] NVARCHAR(100) NOT NULL, 
+    [Password] VARCHAR(50) NOT NULL, 
+    [DateInserted] DATETIME NOT NULL DEFAULT GetDate()
+)
+</code>		
+</pre>
+
+
+<p>Add a service that will add/retrieve the users.</p>
+
+<p>Create a user business object</p>
+<pre class="prettyprint">
+<code>
+using Dapper.Contrib.Extensions;
+using System;
+
+
+namespace ChatAppBO
+{
+    [Table("Users")]
+    public class UserBO
+    {
+        [Key]
+        public int? UserId { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+
+        public DateTime DateInserted { get; set; }
+
+        [Computed]
+        public bool UserAdded { get; set; }
+
+        [Computed]
+        public bool EmailExists { get; set; }
+
+        [Computed]
+        public bool UserNameExists { get; set; }
+
+    }
+}
+
+</code>		
+</pre>
+
+
+<p>Add new API action methods to the controller for adding and retrieving users.</p>
+	
+<p></p>
+<pre class="prettyprint">
+<code>
+
+</code>		
+</pre>
+
+
+     
+</div>
+
+</body>
+</html>
